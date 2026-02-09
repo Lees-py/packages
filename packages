@@ -1,0 +1,11 @@
+{
+  "versions": ["0.1"],
+  "packages": [
+    {
+      "name": "lee's math",
+      "version": "0.1",
+      "description": "basic math engine",
+      "url": "https://raw.githubusercontent.com/lees-py/LeesPyPackages/main/lees_math.zip"
+    }
+  ]
+}
