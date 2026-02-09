@@ -1,13 +1,43 @@
 import os
+import json
 import importlib.util
+import requests
+
+# -----------------------------------
+# BASIC PATHS
+# -----------------------------------
 
 EXT_DIR = "packages"
+CONFIG_PATH = "config.json"
+
 os.makedirs(EXT_DIR, exist_ok=True)
+
+# -----------------------------------
+# CONFIG SYSTEM
+# -----------------------------------
+
+def load_config():
+    if not os.path.exists(CONFIG_PATH):
+        return {"installed": []}
+    with open(CONFIG_PATH, "r") as f:
+        return json.load(f)
+
+def save_config(cfg):
+    with open(CONFIG_PATH, "w") as f:
+        json.dump(cfg, f, indent=4)
+
+# -----------------------------------
+# COMMAND REGISTRY
+# -----------------------------------
 
 COMMANDS = {}
 
 def register(name, func):
     COMMANDS[name] = func
+
+# -----------------------------------
+# EXTENSION LOADER
+# -----------------------------------
 
 def load_extensions():
     for file in os.listdir(EXT_DIR):
@@ -26,14 +56,67 @@ def load_extensions():
             except Exception as e:
                 print(f"[error loading {file}] {e}")
 
+# -----------------------------------
+# INSTALL COMMAND
+# -----------------------------------
+
+def install_package(args):
+    if len(args) < 1:
+        return "usage: install <package>"
+
+    pkg_name = args[0]
+
+    # load package list from GitHub
+    url = "https://raw.githubusercontent.com/Lees-py/packages/main/packages.json"
+    try:
+        data = requests.get(url).json()
+    except:
+        return "[error] could not load package list"
+
+    # find package entry
+    target = None
+    for pkg in data["packages"]:
+        if pkg["name"] == pkg_name:
+            target = pkg
+            break
+
+    if not target:
+        return f"[error] package '{pkg_name}' not found"
+
+    # download .pkg file
+    file_url = target["url"]
+    filename = file_url.split("/")[-1]
+    save_path = os.path.join(EXT_DIR, filename)
+
+    try:
+        r = requests.get(file_url)
+        with open(save_path, "wb") as f:
+            f.write(r.content)
+    except:
+        return "[error] failed to download package"
+
+    # update config
+    cfg = load_config()
+    if pkg_name not in cfg["installed"]:
+        cfg["installed"].append(pkg_name)
+    save_config(cfg)
+
+    return f"[installed] {pkg_name}"
+
+# register the install command
+register("install", install_package)
+
+# -----------------------------------
+# SHELL LOOP
+# -----------------------------------
+
 def run_shell():
     load_extensions()
 
     while True:
         try:
-            line = input(">>> ")
-
-            if not line.strip():
+            line = input(">>> ").strip()
+            if not line:
                 continue
 
             parts = line.split()
@@ -41,18 +124,19 @@ def run_shell():
             args = parts[1:]
 
             if cmd in COMMANDS:
-                try:
-                    result = COMMANDS[cmd](args)
-                    if result is not None:
-                        print(result)
-                except Exception as e:
-                    print(f"[error] {e}")
+                out = COMMANDS[cmd](args)
+                if out is not None:
+                    print(out)
             else:
                 print(f"[unknown command: {cmd}]")
 
         except KeyboardInterrupt:
             print("\n[exit]")
             break
+
+# -----------------------------------
+# START
+# -----------------------------------
 
 if __name__ == "__main__":
     run_shell()
