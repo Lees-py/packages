@@ -41,7 +41,7 @@ def register(name, func):
 
 def load_extensions():
     for file in os.listdir(EXT_DIR):
-        if file.endswith(".pkg") or file.endswith(".py"):
+        if file.endswith(".Lee") or file.endswith(".LI"):
             path = os.path.join(EXT_DIR, file)
             name = file.rsplit(".", 1)[0]
 
