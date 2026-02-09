@@ -1,18 +1,8 @@
 {
-  "versions": ["0.1"],
   "packages": [
     {
-      "name": "core system",
-      "version": "0.1",
-      "description": "main brain + gui",
-      "url": "https://raw.githubusercontent.com/Lees-py/packages/main/core.pkg",
-      "core": true
-    },
-    {
-      "name": "math",
-      "version": "0.1",
-      "description": "math engine",
-      "url": "https://raw.githubusercontent.com/Lees-py/packages/main/math.pkg"
+      "name": "core.pkg",
+      "url": "https://raw.githubusercontent.com/Lees-py/packages/main/core.pkg"
     }
   ]
 }
