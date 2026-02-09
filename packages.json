@@ -2,10 +2,17 @@
   "versions": ["0.1"],
   "packages": [
     {
-      "name": "lee's math",
+      "name": "core system",
       "version": "0.1",
-      "description": "basic math engine",
-      "url": "https://raw.githubusercontent.com/lees-py/LeesPyPackages/main/lees_math.zip"
+      "description": "main brain + gui",
+      "url": "https://raw.githubusercontent.com/Lees-py/packages/main/core.pkg",
+      "core": true
+    },
+    {
+      "name": "math",
+      "version": "0.1",
+      "description": "math engine",
+      "url": "https://raw.githubusercontent.com/Lees-py/packages/main/math.pkg"
     }
   ]
 }
